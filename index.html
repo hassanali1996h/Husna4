@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>مثلث الحسنة</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#0e0e0e;
+  color:#fff;
+  text-align:center;
+  padding:30px;
+}
+input{
+  padding:12px;
+  font-size:18px;
+  width:260px;
+}
+button{
+  padding:10px 20px;
+  margin-top:10px;
+  font-size:18px;
+  cursor:pointer;
+}
+.triangle{
+  position:relative;
+  width:340px;
+  height:280px;
+  margin:40px auto;
+}
+.point{
+  position:absolute;
+  width:160px;
+  text-align:center;
+}
+.top{ top:0; left:50%; transform:translateX(-50%); }
+.right{ bottom:0; right:0; }
+.left{ bottom:0; left:0; }
+.name{ font-size:22px; color:#00ffcc; }
+.highlight{ color:#ffcc00; }
+
+.cards{
+  margin-top:30px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+.card{
+  background:#1a1a1a;
+  padding:15px;
+  border-radius:12px;
+  text-align:right;
+}
+.card h3{ color:#00ffcc; }
+.card p{ color:#ccc; line-height:1.6; }
+
+.summary{
+  margin-top:20px;
+  background:#111;
+  padding:15px;
+  border-radius:10px;
+  color:#ccc;
+}
+</style>
+</head>
+
+<body>
+
+<h2>مثلث الحسنة</h2>
+
+<input id="nameInput" placeholder="اكتب اسمك">
+<br>
+<button onclick="run()">اكشف مثلثك</button>
+
+<div id="result"></div>
+
+<script>
+
+// جميع الأسماء كما هي (مع التكرار)
+const rawNames = `الواحد
+العفو
+البر
+الشهيد
+البارئ
+اللطيف
+العظيم
+الجبار
+الظاهر
+الرقيب
+الوهاب
+الحليم
+الصمد
+القهار
+الواسع
+المجيب
+المتين
+القريب
+القدوس
+الكفيل
+الأول
+المجيد
+الوكيل
+الحق
+السلام
+البارئ
+الأخر
+الحميد
+الباطن
+المبين
+المؤمن
+المصور
+الحليم
+الودود
+الخبير
+الغني
+المهيمن
+الهاد
+الأحد
+الرأوف
+المجيب
+المؤمن
+رب الشعرى
+ذو الجلال و الاكرام
+ذي المعارج
+ذو الفضل
+شديد العذاب
+رب العالمين
+غالب على أمره
+أشد تنكيلا
+خير الفاصلين
+رب السماوات
+بديع السماوات والأرض
+فاطر السماوات والأرض
+مخرج ما تحذرون
+مخرج ما كنتم تكتمون
+مخرج الميت من الحي
+رفيع الدرجات
+المستعان على ما تصفون
+جاعل الملائكة رسلا
+خير الوارثين
+على كل شيء مقيت
+رب السماوات والأرض
+خير المنزلين
+رب الأرض
+فعال لما يريد
+رب المشرق و المغرب
+أشد بأسا
+رب المشرقين
+شديد المحال
+خير ثوابا
+ذي الطول
+رب المغربين
+الغفور
+العليم
+الولي
+الرحمن
+الملك
+الخالق
+الغفار
+بكل شيء عليم
+ولي المؤمنين
+الرحيم
+ملك الناس
+الخلاق
+غافر الذئب
+علام الغيوب
+ولي المتقين
+ارحم الراحمين
+مالك الملك
+خالق كل شيء
+أهل المغفرة
+عليم بذات الصدور
+نعم المولى
+ذو الرحمة
+مالك يوم الدين
+أحسن الخالقين
+جامع الناس
+ذو عقاب اليم
+واسع المغفرة
+عالم الغيب والشهادة
+الوال
+خير الراحمين
+مليك
+خير الغافرين
+بكل خلق عليم
+ولي الذين أمنوا
+ذو مغفرة
+رب الناس
+شديد العقاب
+الحسيب
+النصير
+القادر
+الواق
+الأعلى
+الحكيم
+ملك الناس
+سريع العقاب
+أسرع الحاسبين
+نعم النصير
+القدير
+أهل التقوى
+العلي
+أحكم الحاكمين
+اله الناس
+خير عقبا
+سريع الحساب
+خير الناصرين
+المقتدر
+ولي المتقين
+المتعال
+خير الحاكمين
+فالق الحب والنوى
+رب العرش
+ذو الجلال و الاكرام
+رب الفلق
+ذو العرش
+الكريم
+الحي
+التواب
+الكبير
+الحفيظ
+الفتاح
+الرزاق
+القوي
+البصير
+العزيز
+المحيط
+القهار
+السميع
+القيوم
+الشكور
+فالق الاصباح
+ذي العرش
+الأكرم
+محي الموتى
+قابل التوب
+المتكبر
+خير حافظا
+خير الفاتحين
+خير الرازقين
+ذو القوة
+بصير بالعباد
+رب العزة
+محيط بالكافرين
+القاهر فوق عباده
+سميع الدعاء
+ذو انتقام
+الشاكر
+نور السماوات والأرض
+خير الماكرين
+متم نوره
+أسرع مكرا`.split("\n").map(n=>n.trim()).filter(n=>n);
+
+// نفس القائمة بدون حذف
+const allNames = rawNames;
+
+// حساب التكرار
+const freqMap = {};
+allNames.forEach(n=>{
+  freqMap[n] = (freqMap[n] || 0) + 1;
+});
+
+const single = allNames.filter(n=>!n.includes(" "));
+
+function normalize(str){
+return str.replace(/[ًٌٍَُِّْ]/g,'')
+.replace(/[أإآ]/g,'ا')
+.replace(/^ال/,'')
+.replace(/\s/g,'');
+}
+
+function scoreName(name,input,covered=[]){
+
+let p = normalize(name);
+let score = 0;
+
+if(p.includes(input[0])) score += 4;
+if(p.includes(input[input.length-1])) score += 3;
+
+let i=0;
+for(let c of p){
+if(c===input[i]) i++;
+}
+if(i>=2) score += 5;
+
+for(let ch of input){
+if(p.includes(ch)) score += 2;
+}
+
+for(let ch of input){
+if(p.includes(ch) && !covered.includes(ch)) score += 3;
+}
+
+score += (freqMap[name] - 1);
+
+return score;
+}
+
+function pickBest(list,input,covered=[],used=[]){
+
+let best=null, max=-1;
+
+for(let n of list){
+
+if(used.includes(n)) continue;
+
+let s = scoreName(n,input,covered);
+
+if(s>max){
+max=s;
+best=n;
+}
+}
+
+return best;
+}
+
+function highlight(name,input){
+let r="";
+if(name.startsWith("ال")){
+r+="ال"; name=name.slice(2);
+}
+for(let ch of name){
+if(input.includes(ch)) r+=`<span class="highlight">${ch}</span>`;
+else r+=ch;
+}
+return r;
+}
+
+function explainSmart(name,input,role){
+
+let p = normalize(name);
+let letters = [];
+
+for(let ch of input){
+if(p.includes(ch)) letters.push(ch);
+}
+
+let text = "";
+
+if(role==="start")
+text += "يمثل بداية المثلث لأنه يرتبط بالحرف الأول من الاسم. ";
+
+if(role==="end")
+text += "يمثل نهاية المثلث لاحتوائه على الحرف الأخير. ";
+
+if(role==="balance")
+text += "تم اختياره لإكمال التوازن وتغطية الحروف الناقصة. ";
+
+if(letters.length)
+text += "يغطي الحروف: " + letters.join(" + ") + ". ";
+
+let i=0;
+for(let c of p){
+if(c===input[i]) i++;
+}
+if(i>=2)
+text += "يحافظ على تسلسل مهم من حروف الاسم. ";
+
+return text;
+}
+
+function run(){
+
+let input=normalize(document.getElementById("nameInput").value);
+if(!input) return;
+
+let used=[];
+
+let n1 = pickBest(single,input,[],used);
+used.push(n1);
+
+let n2 = pickBest(single,input,[],used);
+used.push(n2);
+
+let covered=[];
+[n1,n2].forEach(n=>{
+let p=normalize(n);
+for(let ch of input){
+if(p.includes(ch)) covered.push(ch);
+}
+});
+
+let n3 = pickBest(single,input,covered,used);
+used.push(n3);
+
+let coveredSet = new Set();
+[n1,n2,n3].forEach(n=>{
+let p=normalize(n);
+for(let ch of input){
+if(p.includes(ch)) coveredSet.add(ch);
+}
+});
+
+let allLetters = [...input];
+let coveredLetters = [...coveredSet];
+let missing = allLetters.filter(c=>!coveredSet.has(c));
+
+document.getElementById("result").innerHTML = `
+<div class="triangle">
+<svg width="340" height="280">
+<polygon points="170,20 320,250 20,250"
+style="fill:none;stroke:#00ffcc;stroke-width:2"/>
+</svg>
+
+<div class="point top">${highlight(n1,input)}</div>
+<div class="point right">${highlight(n2,input)}</div>
+<div class="point left">${highlight(n3,input)}</div>
+</div>
+
+<div class="cards">
+<div class="card"><h3>${n1}</h3><p>${explainSmart(n1,input,"start")}</p></div>
+<div class="card"><h3>${n2}</h3><p>${explainSmart(n2,input,"end")}</p></div>
+<div class="card"><h3>${n3}</h3><p>${explainSmart(n3,input,"balance")}</p></div>
+</div>
+
+<div class="summary">
+تم تغطية الحروف: ${coveredLetters.join(" + ")} <br>
+الحروف الأقل ظهورًا: ${missing.join(" + ") || "لا يوجد"}
+</div>
+`;
+}
+
+</script>
+
+</body>
+</html>
