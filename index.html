@@ -77,7 +77,7 @@ button{
 
 <script>
 
-// جميع الأسماء كما هي (مع التكرار)
+// 🔴 لا تغيير على الأسماء أبداً
 const rawNames = `الواحد
 العفو
 البر
@@ -252,10 +252,8 @@ const rawNames = `الواحد
 متم نوره
 أسرع مكرا`.split("\n").map(n=>n.trim()).filter(n=>n);
 
-// نفس القائمة بدون حذف
 const allNames = rawNames;
 
-// حساب التكرار
 const freqMap = {};
 allNames.forEach(n=>{
   freqMap[n] = (freqMap[n] || 0) + 1;
@@ -270,14 +268,30 @@ return str.replace(/[ًٌٍَُِّْ]/g,'')
 .replace(/\s/g,'');
 }
 
+// 🔥 الدالة الجديدة (الصوت)
+function prefixMatchLen(a,b){
+  let i=0;
+  while(i<a.length && i<b.length && a[i]===b[i]) i++;
+  return i;
+}
+
+// 🔥 التقييم المطور
 function scoreName(name,input,covered=[]){
 
 let p = normalize(name);
 let score = 0;
 
-if(p.includes(input[0])) score += 4;
-if(p.includes(input[input.length-1])) score += 3;
+// 🔥 التطابق الصوتي
+let prefixLen = prefixMatchLen(p, input);
+score += prefixLen * 5;
 
+if(prefixLen >= 2) score += 5;
+if(prefixLen === 0) score -= 3;
+
+// عامل الطول
+score -= p.length * 0.3;
+
+// باقي النظام القديم
 let i=0;
 for(let c of p){
 if(c===input[i]) i++;
@@ -340,23 +354,16 @@ if(p.includes(ch)) letters.push(ch);
 let text = "";
 
 if(role==="start")
-text += "يمثل بداية المثلث لأنه يرتبط بالحرف الأول من الاسم. ";
+text += "يمثل بداية المثلث لأنه الأقرب صوتياً لبداية الاسم. ";
 
 if(role==="end")
-text += "يمثل نهاية المثلث لاحتوائه على الحرف الأخير. ";
+text += "يمثل نهاية المثلث وفق تطابق الحروف. ";
 
 if(role==="balance")
-text += "تم اختياره لإكمال التوازن وتغطية الحروف الناقصة. ";
+text += "تم اختياره لإكمال التوازن. ";
 
 if(letters.length)
 text += "يغطي الحروف: " + letters.join(" + ") + ". ";
-
-let i=0;
-for(let c of p){
-if(c===input[i]) i++;
-}
-if(i>=2)
-text += "يحافظ على تسلسل مهم من حروف الاسم. ";
 
 return text;
 }
@@ -383,7 +390,6 @@ if(p.includes(ch)) covered.push(ch);
 });
 
 let n3 = pickBest(single,input,covered,used);
-used.push(n3);
 
 let coveredSet = new Set();
 [n1,n2,n3].forEach(n=>{
