@@ -278,6 +278,32 @@ function prefixMatchLen(a,b){
 // 🔥 التقييم المطور
 function scoreName(name,input,covered=[]){
 
+  // 🔥 حساب التسلسل
+let seq = 0;
+let i = 0;
+
+for(let c of p){
+  if(c === input[i]){
+    seq++;
+    i++;
+  }
+}
+
+// 🔥 الحروف الناقصة
+let newCoverage = 0;
+for(let ch of input){
+  if(p.includes(ch) && !covered.includes(ch)){
+    newCoverage++;
+  }
+}
+
+// 🔥 الدمج الذكي
+if(newCoverage > 0){
+  // يغطي نقص + عنده تسلسل
+  score += newCoverage * 10;
+  score += seq * 6;
+}
+  
 let p = normalize(name);
 let score = 0;
 
